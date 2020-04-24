@@ -1,26 +1,34 @@
 <?php
+
 use Symfony\Component\Routing;
 use Symfony\Component\HttpFoundation\Response;
 
-function is_leap_year($year = null){
-    if (null === year) {
-         $year = date('y');
+class LeapYearController
+{
+    public function index($year)
+    {
+        if ($this->is_leap_year($year)) {
+            $year = $year?:date('Y');
+            return new Response('Sim, '.$year.' é um ano bissexto!');
+        }
+
+        return new Response('Não, '.$year.' não é um ano bissexto.');
     }
-  
-    return 0 === $year % 400 || (0 === $year %4 && 0 !== $year % 100);
+
+    private function is_leap_year($year){
+        if (null === $year) {
+            $year = date('Y');
+        }
+
+        return 0 === $year % 400 || (0 === $year %4 && 0 !== $year % 100);
+    }
+
 }
 
 $routes = new Routing\RouteCollection();
-
 $routes->add('leap_year', new Routing\Route('/is_leap_year/{year}', [
     'year' => null,
-    '_controller' => function ($request) {
-        if (is_leap_year($request->attributes->get('year'))){
-            return new Response('Sim, esse é um ano bissexto!');
-        }
-
-        return new Response('Não, esse não é um ano bissexto.');
-     }
+    '_controller' => 'LeapYearController::index'
 ]));
 
 $routes->add('hello', new Routing\Route('/hello/{name}', [
@@ -47,3 +55,4 @@ $routes->add('bye', new Routing\Route('/bye', [
 ]));
 
 return $routes;
+?>
